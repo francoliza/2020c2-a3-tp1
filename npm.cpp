@@ -90,8 +90,8 @@ int BT(int i, int k, int contagio, vector<int>& solParcial){ // BACKTRACKING
 int infinito = -10e6;
 vector< vector<int> > dicc;
 int pd(int i, int m){ //m = M pero como variable local, para no cambiar M
-
-	//cout << i << "t" << m <<endl;
+	//TOP DOWN
+	//cout << i << "t" << m <<endl; //CANTIDAD DE LOCALES??
 	if(m < 0)				return infinito;
 	if(m == 0) 				return 0;
 	if(i >= n) 				return 0;
@@ -186,14 +186,14 @@ int main(int argc, char** argv){
 		optimum = BT(0, 0, limiteDeContagio, solParcial);
 	}
 	else if (algoritmo == "BT-F")
-	{
+	{	//Acá va la imprementación con Backtraking con poda por factivilidad
 		//K = INFTY;
 		//poda_optimalidad = false;
 		//poda_factibilidad = true;
 		//optimum = BT(0, 0, 0);
 	}
 	else if (algoritmo == "BT-O")
-	{
+	{	//Acá va la imprementación con Backtraking con poda por óptimalidad
 		//K = INFTY;
 		//poda_optimalidad = true;
 		//poda_factibilidad = false;
@@ -206,6 +206,7 @@ int main(int argc, char** argv){
 		//for (int i = 0; i < n+1; ++i)
 		//	for (int j = 0; j < W+1; ++j)
 		//		PD(i, j);
+		optimum = pd(0, limiteDeContagio);
 
 		//// Obtenemos la solucion optima.
 		//optimum = PD(0, 0);

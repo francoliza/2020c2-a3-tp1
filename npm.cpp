@@ -77,10 +77,10 @@ int backtracking(int localActual, int k, int contagio, vector<int>& solParcial){
 }
 
 //defino un diccionario
-int infinito = -10e6; //
+int infinito = 10e6; //
 int programacionDinamica(int localActual, int contagio, vector<vector<int> >& dicc){ //m = M pero como variable local, para no cambiar M
 	//TOP DOWN con memoización
-	if(contagio < 0) 				return infinito;
+	if(contagio < 0) 				return -infinito;
 	if(contagio == 0) 				return 0;
 	if(localActual >= cantidadDeLocales)		return 0;
 	if(dicc[localActual][contagio] == -1){

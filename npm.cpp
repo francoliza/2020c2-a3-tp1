@@ -10,83 +10,101 @@
 
 using namespace std;
 
-int limiteDeContagio;
-int cantidadDeLocales;
-vector<int> beneficioDeLocal;
-vector<int> contagioPorLocal;
+int M; 						//limite de contagio 
+int n; 						//cantidad de locales 
+vector<int> b;				//beneficio para cada local
+vector<int> c;				//contagio que produce cada local
+int inf = 10e6;
 
 //i el local que estoy tomando en cuenta
-//k cardinal hasta el momento.
-int fuerzaBruta(int localActual, int k, int contagio, vector<int>& solParcial){ // FUERZA BRUTA
-	if (localActual >= cantidadDeLocales) //caso en que soy hoja
+//k cardinal de beneficio hasta el momento.
+//m contagio maximo
+//sol vector de solucion parcial
+int fuerzaBruta(int i, int k, int m, vector<int> sol){ // FUERZA BRUTA
+	if (i==n) //caso en que soy hoja
 	{
-		if (contagio>=0)
+		if (m>=0)
 		{
-			/*for (int i = 0; i < solParcial.size(); ++i)
-			{
-				cout << solParcial[i] << ", ";
-			}
-			cout << " no "<< endl;*/
+			//si son locales contiguos no es una solucion valida.
+			if(sol.size()>=2){
+				for (int j=0; j<sol.size()-1; ++j)
+				{
+					if (sol[j]+1 == sol[j+1])
+					{
+						return -inf;
+					}
+				}				
+			}	
+
 			return k;
 		}
-		//creo que no hace falta verificar si es que estoy viendo
-		//negocios de por medio.
-		return 0;
+		return -inf;
 	}
 
-
-	solParcial.push_back(localActual);
-	int der = fuerzaBruta(localActual+2, k+beneficioDeLocal[localActual], contagio-contagioPorLocal[localActual], solParcial);
-	//sumo dos a "localActual" para que no agarre el de al lado si es que agrego un negocio
-
-	solParcial.pop_back();
-	int izq = fuerzaBruta(localActual+1, k, contagio, solParcial);
+	//recursion agregando el local i
+	sol.push_back(i);
+	int der = fuerzaBruta(i+1, k+b[i], m-c[i], sol);
+	//recursion agregando el 
+	sol.pop_back();
+	int izq = fuerzaBruta(i+1, k, m, sol);
 
 	return max(izq, der);
 }
 
-int backtracking(int localActual, int k, int contagio, vector<int>& solParcial){ // BACKTRACKING
-	if (localActual >= cantidadDeLocales) //caso en que soy hoja
+int maximo = 0;
+bool poda_optimalidad = true;
+bool poda_factibilidad = true;
+int backtracking(int i, int k, int m){ // BACKTRACKING
+	if (i>=n) //caso en que soy hoja y vi todos los locales
 	{
-		if (contagio>=0)
+		if (m>=0)
 		{
+			//aca como sumo de a dos ya estoy construyendo una solucion valida
+			if (k>maximo)
+			{
+				maximo = k; 
+				return maximo;
+			}
 			return k;
 		}
-		//creo que no hace falta verificar si es que estoy viendo
-		//negocios de por medio.
-		return -1; //sino devuelvo algo que no cuente como sol
+		return -inf;
 	}
 
-	/*aca van las podas. */
-
-	//podas por factibilidad
-	if (contagio<0){
-		return -1;
+	//poda por factibilidad
+	if (poda_factibilidad and m<0){
+		return -inf;
 	}
-
 	//podas por optimalidad
+	//miro los elementos que me quedan por agregar si no superan el maximo salgo
+	if (poda_optimalidad)
+	{
+		int p = k; 
+		for (int j=i; j<n; ++j)
+		{
+			p=p+b[j];
+		}
+		if (p<maximo){
+			return -inf;
+		}
+	}
 
-	solParcial.push_back(localActual);
-	int der = backtracking(localActual+2, k+beneficioDeLocal[localActual], contagio-contagioPorLocal[localActual], solParcial);
-	//sumo dos a i para que no agarre el de al lado ya que agrego al negocio i.
-
-	solParcial.pop_back();
-	int izq = backtracking(localActual+1, k, contagio, solParcial);
-
-	return max(izq, der);
+	//hago la recursion y tomo el maximo beneficio obtenido.
+	//en cada paso construyo una solucion valida ya que si agrego el elemento i 
+	//me aseguro no agregar el i+1.(especie de poda)
+	return max(backtracking(i+1, k, m), backtracking(i+2, k+b[i], m-c[i]));
 }
 
 //defino un diccionario
-int infinito = 10e6; //
-int programacionDinamica(int localActual, int contagio, vector<vector<int> >& dicc){ //m = M pero como variable local, para no cambiar M
+//vector<vector<int> > dicc;
+int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
 	//TOP DOWN con memoización
-	if(contagio < 0) 				return -infinito;
-	if(contagio == 0) 				return 0;
-	if(localActual >= cantidadDeLocales)		return 0;
-	if(dicc[localActual][contagio] == -1){
-		dicc[localActual][contagio] = max(programacionDinamica(localActual+1, contagio, dicc), programacionDinamica(localActual+2, contagio-contagioPorLocal[localActual], dicc) + beneficioDeLocal[localActual]);
+	if(m < 0) 	return -inf;
+	if(m == 0) 	return 0;
+	if(i >= n)	return 0;
+	if(dicc[i][m] == -1){
+		dicc[i][m] = max(programacionDinamica(i+1, m, dicc), programacionDinamica(i+2, m-c[i], dicc)+b[i]);
 	}
-	return dicc[localActual][contagio];
+	return dicc[i][m];
 }
 
 
@@ -108,19 +126,19 @@ int main(int argc, char** argv){
 	string algoritmo = argv[1];
 
     // Leemos el input.
-    cin >> cantidadDeLocales >> limiteDeContagio;
-    beneficioDeLocal.assign(cantidadDeLocales, 0);
-    contagioPorLocal.assign(cantidadDeLocales, 0);
+    cin >> n >> M;
+    b.assign(n, 0);
+    c.assign(n, 0);
 
 
-    for (int i = 0; i < cantidadDeLocales; ++i) {
-    	cin >> beneficioDeLocal[i];
-    	cin >> contagioPorLocal[i];
+    for (int i=0; i<n; ++i) {
+    	cin >> b[i];
+    	cin >> c[i];
     }
 
-    vector<int> solParcial;
-    cout << "Cantidad de locales: " << cantidadDeLocales << endl;
-    cout << "Limite de contagio: " << limiteDeContagio << endl;
+    vector<int> sol;
+    cout << "Cantidad de locales: " << n << endl;
+    cout << "Limite de contagio: " << M << endl;
 
     // Ejecutamos el algoritmo y obtenemos su tiempo de ejecución.
 	int optimum;
@@ -128,31 +146,33 @@ int main(int argc, char** argv){
 	auto start = chrono::steady_clock::now();
 	if (algoritmo == "FB")
 	{
-		optimum = fuerzaBruta(0, 0, limiteDeContagio, solParcial);
+		optimum = fuerzaBruta(0, 0, M, sol);
 	}
 	else if (algoritmo == "BT")
 	{
 		//K = INFTY;
 		//poda_optimalidad = poda_factibilidad = true;
-		optimum = backtracking(0, 0, limiteDeContagio, solParcial);
+		optimum = backtracking(0, 0, M);
 	}
 	else if (algoritmo == "BT-F")
 	{	//Acá va la imprementación con Backtraking con poda por factivilidad
-		//poda_optimalidad = false;
-		//poda_factibilidad = true;
-		//optimum = BT(0, 0, 0);
+		poda_optimalidad = false;
+		poda_factibilidad = true;
+		optimum = backtracking(0, 0, M);
 	}
 	else if (algoritmo == "BT-O")
 	{	//Acá va la imprementación con Backtraking con poda por óptimalidad
-		//poda_optimalidad = true;
-		//poda_factibilidad = false;
-		//optimum = BT(0, 0, 0);
+		poda_optimalidad = true;
+		poda_factibilidad = false;
+		optimum = backtracking(0, 0, M);
 	}
 	else if (algoritmo == "PD")
 	{
 		// Obtenemos la solucion optima.
-		vector< vector<int> > dicc(cantidadDeLocales+1, vector<int>(limiteDeContagio+1, -1));
-		optimum = programacionDinamica(0, limiteDeContagio, dicc);
+		vector< vector<int> > d(n+1, vector<int>(M+1, -1));
+		//no se si hay que buscar el max por toda la matriz;
+
+		optimum = programacionDinamica(0, M, d);
 	}
 	auto end = chrono::steady_clock::now();
 	double total_time = chrono::duration<double, milli>(end - start).count();
@@ -161,7 +181,7 @@ int main(int argc, char** argv){
 	clog << "Tiempo en ejecución: " << total_time << endl;
 
     // Imprimimos el resultado por stdout.
-    cout << (optimum == infinito ? -1 : optimum) << endl;
+    cout << (optimum == inf ? -1 : optimum) << endl;
    
     return 0;
 }

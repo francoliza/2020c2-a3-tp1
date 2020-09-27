@@ -10,8 +10,8 @@
 
 using namespace std;
 
-int M; 						//limite de contagio 
-int n; 						//cantidad de locales 
+int M; 						//limite de contagio
+int n; 						//cantidad de locales
 vector<int> b;				//beneficio para cada local
 vector<int> c;				//contagio que produce cada local
 int inf = 10e6;
@@ -33,8 +33,8 @@ int fuerzaBruta(int i, int k, int m, vector<int> sol){ // FUERZA BRUTA
 					{
 						return -inf;
 					}
-				}				
-			}	
+				}
+			}
 
 			return k;
 		}
@@ -44,7 +44,7 @@ int fuerzaBruta(int i, int k, int m, vector<int> sol){ // FUERZA BRUTA
 	//recursion agregando el local i
 	sol.push_back(i);
 	int der = fuerzaBruta(i+1, k+b[i], m-c[i], sol);
-	//recursion agregando el 
+	//recursion agregando el
 	sol.pop_back();
 	int izq = fuerzaBruta(i+1, k, m, sol);
 
@@ -62,7 +62,7 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 			//aca como sumo de a dos ya estoy construyendo una solucion valida
 			if (k>maximo)
 			{
-				maximo = k; 
+				maximo = k;
 				return maximo;
 			}
 			return k;
@@ -78,7 +78,7 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 	//miro los elementos que me quedan por agregar si no superan el maximo salgo
 	if (poda_optimalidad)
 	{
-		int p = k; 
+		int p = k;
 		for (int j=i; j<n; ++j)
 		{
 			p=p+b[j];
@@ -89,7 +89,7 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 	}
 
 	//hago la recursion y tomo el maximo beneficio obtenido.
-	//en cada paso construyo una solucion valida ya que si agrego el elemento i 
+	//en cada paso construyo una solucion valida ya que si agrego el elemento i
 	//me aseguro no agregar el i+1.(especie de poda)
 	return max(backtracking(i+1, k, m), backtracking(i+2, k+b[i], m-c[i]));
 }
@@ -107,18 +107,30 @@ int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
 	return dicc[i][m];
 }
 
+void printVector(vector<int> v){
+	cout << "[";
+	for (int i = 0; i < v.size(); ++i){
+		cout << v[i];
+		if(i == v.size() - 1){
+			cout << ",";
+		}
+	}
+	cout << "]" << endl;
+
+}
+
 
 int main(int argc, char** argv){
 	// Leemos el parametro que indica el algoritmo a ejecutar.
 	map<string, string> algoritmos_implementados = {
-		{"FB", "Fuerza Bruta"}, {"BT", "Backtracking con podas"}, {"BT-F", "Backtracking con poda por factibilidad"}, 
+		{"FB", "Fuerza Bruta"}, {"BT", "Backtracking con podas"}, {"BT-F", "Backtracking con poda por factibilidad"},
 		{"BT-O", "Backtracking con poda por optimalidad"}, {"PD", "Programacion dinámica"}
 	};
 
 	// Verificar que el algoritmo pedido exista.
 	if (argc < 2 || algoritmos_implementados.find(argv[1]) == algoritmos_implementados.end())
 	{
-		cerr << "Algoritmo no encontrado: " << argv[1] << endl;
+		cerr << "Algoritmo no encontrado: " << endl;
 		cerr << "Los algoritmos existentes son: " << endl;
 		for (auto& alg_desc: algoritmos_implementados) cerr << "\t- " << alg_desc.first << ": " << alg_desc.second << endl;
 		return 0;
@@ -137,8 +149,6 @@ int main(int argc, char** argv){
     }
 
     vector<int> sol;
-    cout << "Cantidad de locales: " << n << endl;
-    cout << "Limite de contagio: " << M << endl;
 
     // Ejecutamos el algoritmo y obtenemos su tiempo de ejecución.
 	int optimum;
@@ -178,10 +188,10 @@ int main(int argc, char** argv){
 	double total_time = chrono::duration<double, milli>(end - start).count();
 
 	// Imprimimos el tiempo de ejecución por stderr.
-	clog << "Tiempo en ejecución: " << total_time << endl;
+	clog << total_time << endl;
 
     // Imprimimos el resultado por stdout.
     cout << (optimum == inf ? -1 : optimum) << endl;
-   
+
     return 0;
 }

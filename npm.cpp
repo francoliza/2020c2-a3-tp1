@@ -99,7 +99,6 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
 	//TOP DOWN con memoización
 	if(m < 0) 	return -inf;
-	if(m == 0) 	return 0;
 	if(i >= n)	return 0;
 	if(dicc[i][m] == -1){
 		dicc[i][m] = max(programacionDinamica(i+1, m, dicc), programacionDinamica(i+2, m-c[i], dicc)+b[i]);

@@ -160,7 +160,7 @@ int main(int argc, char** argv){
 	else if (algoritmo == "BT")
 	{
 		//K = INFTY;
-		//poda_optimalidad = poda_factibilidad = true;
+		poda_optimalidad = poda_factibilidad = true;
 		optimum = backtracking(0, 0, M);
 	}
 	else if (algoritmo == "BT-F")

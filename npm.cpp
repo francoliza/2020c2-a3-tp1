@@ -14,8 +14,8 @@ int M; 						//limite de contagio
 int n; 						//cantidad de locales
 vector<int> b;				//beneficio para cada local
 vector<int> c;				//contagio que produce cada local
-int inf = 10e6;
 
+int inf = 10e6;
 //i el local que estoy tomando en cuenta
 //k cardinal de beneficio hasta el momento.
 //m contagio maximo
@@ -40,10 +40,10 @@ int fuerzaBruta(int i, int k, int m, vector<int> sol){ // FUERZA BRUTA
 		}
 		return -inf;
 	}
-
 	//recursion agregando el local i
 	sol.push_back(i);
 	int der = fuerzaBruta(i+1, k+b[i], m-c[i], sol);
+	
 	//recursion agregando el
 	sol.pop_back();
 	int izq = fuerzaBruta(i+1, k, m, sol);
@@ -54,6 +54,7 @@ int fuerzaBruta(int i, int k, int m, vector<int> sol){ // FUERZA BRUTA
 int maximo = 0;
 bool poda_optimalidad = true;
 bool poda_factibilidad = true;
+
 int backtracking(int i, int k, int m){ // BACKTRACKING
 	if (i>=n) //caso en que soy hoja y vi todos los locales
 	{
@@ -94,9 +95,8 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 	return max(backtracking(i+1, k, m), backtracking(i+2, k+b[i], m-c[i]));
 }
 
-//defino un diccionario
-//vector<vector<int> > dicc;
 int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
+
 	//TOP DOWN con memoización
 	if(m < 0) 	return -inf;
 	if(i >= n)	return 0;
@@ -104,18 +104,6 @@ int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
 		dicc[i][m] = max(programacionDinamica(i+1, m, dicc), programacionDinamica(i+2, m-c[i], dicc)+b[i]);
 	}
 	return dicc[i][m];
-}
-
-void printVector(vector<int> v){
-	cout << "[";
-	for (int i = 0; i < v.size(); ++i){
-		cout << v[i];
-		if(i == v.size() - 1){
-			cout << ",";
-		}
-	}
-	cout << "]" << endl;
-
 }
 
 
@@ -150,8 +138,7 @@ int main(int argc, char** argv){
     vector<int> sol;
 
     // Ejecutamos el algoritmo y obtenemos su tiempo de ejecución.
-	int optimum;
-	//optimum = INFTY;
+	int optimum=0;
 	auto start = chrono::steady_clock::now();
 	if (algoritmo == "FB")
 	{
@@ -180,6 +167,9 @@ int main(int argc, char** argv){
 		// Obtenemos la solucion optima.
 		vector< vector<int> > d(n+1, vector<int>(M+1, -1));
 		//no se si hay que buscar el max por toda la matriz;
+		for (int i = 0; i < n+1; ++i)
+			for (int j = 0; j < M+1; ++j)
+				programacionDinamica(i, j, d);
 
 		optimum = programacionDinamica(0, M, d);
 	}

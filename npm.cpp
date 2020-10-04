@@ -95,6 +95,7 @@ int backtracking(int i, int k, int m){ // BACKTRACKING
 	return max(backtracking(i+1, k, m), backtracking(i+2, k+b[i], m-c[i]));
 }
 
+vector<vector<int>> d;
 int programacionDinamica(int i, int m, vector<vector<int> >&dicc){
 
 	//TOP DOWN con memoización
@@ -165,7 +166,7 @@ int main(int argc, char** argv){
 	else if (algoritmo == "PD")
 	{
 		// Obtenemos la solucion optima.
-		vector< vector<int> > d(n+1, vector<int>(M+1, -1));
+		d = vector<vector<int>>(n+1, vector<int>(M+1, -1));
 		//no se si hay que buscar el max por toda la matriz;
 		for (int i = 0; i < n+1; ++i)
 			for (int j = 0; j < M+1; ++j)
